@@ -6,13 +6,15 @@
 #include <iostream>
 #include <stdio.h>
 
+#define PI 3.14159265
+
 using namespace std;
 using namespace cv;
 
-void setFaceLab();
-void setLipLab();
+void setFaceHSV();
+void setLipHSV();
 void sampleExtraction(Mat frame);
-void rgbToLab();
+void rgbToHSV();
 Point3d binarySplit(Point3d sample[]);
 double getDistance(Point3d a, Point3d b);
 void findSkin(Point3d a);
@@ -22,7 +24,7 @@ int findMinIdx(float arr[], int len);
 String face_cascade_name = "haarcascade_frontalface_alt.xml";
 String eyes_cascade_name = "haarcascade_eye.xml";
 String nose_cascade_name = "Nariz.xml";
-String img_name = "face.png";
+String img_name = "¼¼ÈÆ.png";
 CascadeClassifier face_cascade;
 CascadeClassifier eyes_cascade;
 CascadeClassifier nose_cascade;
@@ -50,10 +52,10 @@ int main(int argc, const char** argv) {
 	if (!eyes_cascade.load(eyes_cascade_name)) { printf("--(!)Error Eyes cascade loading\n"); return -1;};
 	if (!nose_cascade.load(nose_cascade_name)) { printf("--(!)Error Nose cascade loading\n"); return -1;};
 
-	setFaceLab(); //personal color setting
-	setLipLab();
+	setFaceHSV(); //personal color setting
+	setLipHSV();
 	sampleExtraction(img); //Sample Extraction
-	rgbToLab(); //RGB to Lab
+	rgbToHSV(); //RGB to HSV
 	
 	//imshow("sampleLab.png", sample[2]);
 
@@ -73,7 +75,7 @@ int main(int argc, const char** argv) {
 	return 0;
 }
 
-void setFaceLab() {
+void setFaceHSV() {
 	Mat temp(4,4,CV_8UC3);
 
 	temp.at<Vec3b>(0, 0) = Vec3b(175, 215, 250); //Spring
@@ -93,23 +95,23 @@ void setFaceLab() {
 	temp.at<Vec3b>(3, 2) = Vec3b(131, 212, 249);
 	temp.at<Vec3b>(3, 3) = Vec3b(112, 181, 220);
 
-	Mat tempLab;
-	temp.convertTo(tempLab, CV_32FC3, (double)1.f/255.f);
+	Mat tempHSV;
+	temp.convertTo(tempHSV, CV_32FC3, (double)1.f/255.f);
 
-	cvtColor(tempLab, tempLab, CV_BGR2Lab);
+	cvtColor(tempHSV, tempHSV, CV_BGR2HSV);
 	
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			skinColor[i][j].x = tempLab.at<Vec3f>(i, j)[0];
-			skinColor[i][j].y = tempLab.at<Vec3f>(i, j)[1];
-			skinColor[i][j].z = tempLab.at<Vec3f>(i, j)[2];
+			skinColor[i][j].x = tempHSV.at<Vec3f>(i, j)[0];
+			skinColor[i][j].y = 100*tempHSV.at<Vec3f>(i, j)[1];
+			skinColor[i][j].z = 100*tempHSV.at<Vec3f>(i, j)[2];
 		}
 	}
 	
 	//imshow("personal color", temp);
 }
 
-void setLipLab() {
+void setLipHSV() {
 	Mat temp(4, 6, CV_8UC3);
 	
 	temp.at<Vec3b>(0, 0) = Vec3b(79,79,234); //Spring
@@ -137,16 +139,16 @@ void setLipLab() {
 	temp.at<Vec3b>(3, 4) = Vec3b(40,5,164);
 	temp.at<Vec3b>(3, 5) = Vec3b(19,2,208);
 
-	Mat tempLab;
-	temp.convertTo(tempLab, CV_32FC3, (double)1.f / 255.f);
+	Mat tempHSV;
+	temp.convertTo(tempHSV, CV_32FC3, (double)1.f / 255.f);
 
-	cvtColor(tempLab, tempLab, CV_BGR2Lab);
+	cvtColor(tempHSV, tempHSV, CV_BGR2HSV);
 
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 6; j++) {
-			lipColor[i][j].x = tempLab.at<Vec3f>(i, j)[0];
-			lipColor[i][j].y = tempLab.at<Vec3f>(i, j)[1];
-			lipColor[i][j].z = tempLab.at<Vec3f>(i, j)[2];
+			lipColor[i][j].x = tempHSV.at<Vec3f>(i, j)[0];
+			lipColor[i][j].y = 100*tempHSV.at<Vec3f>(i, j)[1];
+			lipColor[i][j].z = 100*tempHSV.at<Vec3f>(i, j)[2];
 		}
 	}
 
@@ -232,23 +234,23 @@ void sampleExtraction(Mat frame) {
 
 }
 
-void rgbToLab() {
+void rgbToHSV() {
 	int i;
-	Mat tempLab[5];
+	Mat tempHSV[5];
 
 	//Lab·Î º¯È¯
 	for (int i = 0; i < 5; i++) {
-		sample[i].convertTo(tempLab[i], CV_32FC3, (double)1.f / 255.f);
-		cvtColor(tempLab[i], tempLab[i], CV_BGR2Lab);
+		sample[i].convertTo(tempHSV[i], CV_32FC3, (double)1.f / 255.f);
+		cvtColor(tempHSV[i], tempHSV[i], CV_BGR2HSV);
 	}
 
 
 	i = 0;
 	for (int x = 0; x < 10; x++) {  //10 = sample[0].cols
 		for (int y = 0; y < 10; y++) { //10 = sample[0].rows
-			forehead[i].x = tempLab[0].at<Vec3f>(y, x)[0];
-			forehead[i].y = tempLab[0].at<Vec3f>(y, x)[1];
-			forehead[i].z = tempLab[0].at<Vec3f>(y, x)[2];
+			forehead[i].x = tempHSV[0].at<Vec3f>(y, x)[0];
+			forehead[i].y = 100 * tempHSV[0].at<Vec3f>(y, x)[1];
+			forehead[i].z = 100 * tempHSV[0].at<Vec3f>(y, x)[2];
 			i++;
 		}	
 	}
@@ -256,9 +258,9 @@ void rgbToLab() {
 	i = 0;
 	for (int x = 0; x < 10; x++) {  
 		for (int y = 0; y < 10; y++) { 
-			temple1[i].x = tempLab[1].at<Vec3f>(y, x)[0];
-			temple1[i].y = tempLab[1].at<Vec3f>(y, x)[1];
-			temple1[i].z = tempLab[1].at<Vec3f>(y, x)[2];
+			temple1[i].x = tempHSV[1].at<Vec3f>(y, x)[0];
+			temple1[i].y = 100 * tempHSV[1].at<Vec3f>(y, x)[1];
+			temple1[i].z = 100 * tempHSV[1].at<Vec3f>(y, x)[2];
 			i++;
 		}
 	}
@@ -266,9 +268,9 @@ void rgbToLab() {
 	i = 0;
 	for (int x = 0; x < 10; x++) {  
 		for (int y = 0; y < 10; y++) { 
-			temple2[i].x = tempLab[2].at<Vec3f>(y, x)[0];
-			temple2[i].y = tempLab[2].at<Vec3f>(y, x)[1];
-			temple2[i].z = tempLab[2].at<Vec3f>(y, x)[2];
+			temple2[i].x = tempHSV[2].at<Vec3f>(y, x)[0];
+			temple2[i].y = 100 * tempHSV[2].at<Vec3f>(y, x)[1];
+			temple2[i].z = 100 * tempHSV[2].at<Vec3f>(y, x)[2];
 			i++;
 		}
 	}
@@ -276,9 +278,9 @@ void rgbToLab() {
 	i = 0;
 	for (int x = 0; x < 10; x++) { 
 		for (int y = 0; y < 10; y++) { 
-			cheek1[i].x = tempLab[3].at<Vec3f>(y, x)[0];
-			cheek1[i].y = tempLab[3].at<Vec3f>(y, x)[1];
-			cheek1[i].z = tempLab[3].at<Vec3f>(y, x)[2];
+			cheek1[i].x = tempHSV[3].at<Vec3f>(y, x)[0];
+			cheek1[i].y = 100 * tempHSV[3].at<Vec3f>(y, x)[1];
+			cheek1[i].z = 100 * tempHSV[3].at<Vec3f>(y, x)[2];
 			i++;
 		}
 	}
@@ -286,9 +288,9 @@ void rgbToLab() {
 	i = 0;
 	for (int x = 0; x < 10; x++) {  
 		for (int y = 0; y < 10; y++) { 
-			cheek2[i].x = tempLab[4].at<Vec3f>(y, x)[0];
-			cheek2[i].y = tempLab[4].at<Vec3f>(y, x)[1];
-			cheek2[i].z = tempLab[4].at<Vec3f>(y, x)[2];
+			cheek2[i].x = tempHSV[4].at<Vec3f>(y, x)[0];
+			cheek2[i].y = 100 * tempHSV[4].at<Vec3f>(y, x)[1];
+			cheek2[i].z = 100 * tempHSV[4].at<Vec3f>(y, x)[2];
 			i++;
 		}
 	}
@@ -362,8 +364,20 @@ Point3d binarySplit(Point3d sample[]) {
 
 double getDistance(Point3d a, Point3d b) {
 	double distance;
-
-	distance = sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+	float h1, h2, s1, s2;
+	float theta;
+	
+	if (a.x > b.x) {
+		h1 = a.x; h2 = b.x;
+		s1 = a.y; s2 = b.y;
+	}
+	else {
+		h1 = b.x; h2 = a.x;
+		s1 = b.y; s2 = a.y;
+	}
+	theta = (h1 - h2)*PI / 180;
+	
+	distance = (theta*sqrt(pow(s1, 2) + pow(s2, 2) - 2 * s1*s2*cos(theta))) / (2 * sin(theta / 2));
 	
 	return distance;
 }
@@ -388,6 +402,7 @@ void findSkin(Point3d a) {
 		printf("%lf\t", distance[i]);
 		if (i % 4 == 3) printf("\n");
 	}
+	*/
 
 	printf("%lf %lf %lf\n", a.x, a.y, a.z);
 	
@@ -398,7 +413,7 @@ void findSkin(Point3d a) {
 		printf("\n");
 	}
 	printf("\n\n");
-	*/
+	
 }
 
 void findLip(Point3d a, int personalColor) {
@@ -423,12 +438,13 @@ void findLip(Point3d a, int personalColor) {
 	printf("\n\n");
 	*/
 
+	/*
 	for (int i = 0; i < 6; i++) {
 		distance[i] = getDistance(a, lipColor[personalColor][i]);
 		printf("%12lf",distance[i]);
 	}
 	printf("\n");
-
+	*/
 
 }
 
