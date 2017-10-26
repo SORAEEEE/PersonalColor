@@ -17,9 +17,10 @@ void sampleExtraction(Mat frame);
 void rgbToHSV();
 Point3d binarySplit(Point3d sample[]);
 double getDistance(Point3d a, Point3d b);
-void findSkin(Point3d a);
-void findLip(Point3d a, int personalColor);
+int findSkin(Point3d a[]);
+void findLip(Point3d a[], int personalColor);
 int findMinIdx(float arr[], int len);
+int findMaxIdx(int arr[], int len);
 
 String face_cascade_name = "haarcascade_frontalface_alt.xml";
 String eyes_cascade_name = "haarcascade_eye.xml";
@@ -42,6 +43,7 @@ static Point3d lipColor[4][6];
 int main(int argc, const char** argv) {
 	Mat img = imread(img_name);
 	Point3d mainVal[5]; //sample main value
+	int personalColor;
 
 	if (img.data == NULL) {
 		printf("이미지 열기 실패");
@@ -56,8 +58,6 @@ int main(int argc, const char** argv) {
 	setLipHSV();
 	sampleExtraction(img); //Sample Extraction
 	rgbToHSV(); //RGB to HSV
-	
-	//imshow("sampleLab.png", sample[2]);
 
 	/* Select main value */
 	mainVal[0] = binarySplit(forehead);
@@ -67,9 +67,8 @@ int main(int argc, const char** argv) {
 	mainVal[4] = binarySplit(cheek2);
 	
 	/* Find personal color */
-	for (int i = 0; i < 5; i++) {
-		findSkin(mainVal[i]);
-	}
+	personalColor = findSkin(mainVal);
+	findLip(mainVal, personalColor);
 	
 	waitKey(0);
 	return 0;
@@ -152,7 +151,7 @@ void setLipHSV() {
 		}
 	}
 
-	//imshow("LIP", temp);
+	imshow("LIP", temp);
 }
 
 void sampleExtraction(Mat frame) {
@@ -238,7 +237,7 @@ void rgbToHSV() {
 	int i;
 	Mat tempHSV[5];
 
-	//Lab로 변환
+	//HSV로 변환
 	for (int i = 0; i < 5; i++) {
 		sample[i].convertTo(tempHSV[i], CV_32FC3, (double)1.f / 255.f);
 		cvtColor(tempHSV[i], tempHSV[i], CV_BGR2HSV);
@@ -382,46 +381,46 @@ double getDistance(Point3d a, Point3d b) {
 	return distance;
 }
 
-void findSkin(Point3d a) {
+int findSkin(Point3d a[]) {
 	float distance[16];
-	int idx = 0;
-	int personalColor; //봄,여름,가을,겨울 = 0,1,2,3
+	int personalColor[4] = { 0, }; //봄,여름,가을,겨울 = 0,1,2,3
+	
+	
+	for (int sampleN = 0; sampleN < 5; sampleN++) {
+		int idx = 0;
 
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			distance[idx] = getDistance(a, skinColor[i][j]);
-			idx++;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				distance[idx] = getDistance(a[sampleN], skinColor[i][j]);
+				//printf("%lf\t", distance[idx]);
+				idx++;
+			}
+			//printf("\n");
 		}
+		personalColor[findMinIdx(distance, 16)] ++; //거리가 가장 짧은 계절(행index)을 반환한다	
+		for (int i = 0; i < 16; i++) { distance[i] = 0; } //초기화
+		
+		//printf("\n\n");
 	}
-
-	personalColor = findMinIdx(distance, 16); //거리가 가장 짧은 계절(행index)을 반환한다	
-	findLip(a, personalColor);
-
+	
 	/*
-	for (int i = 0; i < 16; i++) {
-		printf("%lf\t", distance[i]);
-		if (i % 4 == 3) printf("\n");
+	for (int i = 0; i < 4; i++) {
+		printf("%d  ", personalColor[i]);
 	}
 	*/
 
-	printf("%lf %lf %lf\n", a.x, a.y, a.z);
-	
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			printf("%lf\t", getDistance(a, skinColor[i][j]));
-		}
-		printf("\n");
-	}
-	printf("\n\n");
-	
+	return findMaxIdx(personalColor, 4);
+
 }
 
-void findLip(Point3d a, int personalColor) {
-	float distance[6]; 
+void findLip(Point3d a[], int personalColor) {
+	float distance[5][6]; 
     
-	/*
-	printf("%12lf\t%12lf\t%12lf\n\n", a.x, a.y, a.z);
+	//LIP color 확인용
 	
+
+	//printf("%12lf\n%12lf\n%12lf\n\n", a[0].x, a[0].y, a[0].z);
+
 	for (int i = 0; i < 6; i++) {
 		printf("%12lf", lipColor[personalColor][i].x);
 	}
@@ -436,15 +435,18 @@ void findLip(Point3d a, int personalColor) {
 		printf("%12lf", lipColor[personalColor][i].z);
 	}
 	printf("\n\n");
-	*/
+	
 
-	/*
-	for (int i = 0; i < 6; i++) {
-		distance[i] = getDistance(a, lipColor[personalColor][i]);
-		printf("%12lf",distance[i]);
+
+
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 6; j++) {
+			distance[i][j] = getDistance(a[i], lipColor[personalColor][j]);
+			printf("%12lf", distance[i][j]);
+		}
+		printf("\n");
 	}
-	printf("\n");
-	*/
 
 }
 
@@ -458,8 +460,19 @@ int findMinIdx(float arr[], int len) {
 			minIdx = i;
 		}
 	}
-
-	//printf("%d %lf", minIdx, min);
-
 	return minIdx / 4;
+}
+
+int findMaxIdx(int arr[], int len) {
+	int max = arr[0];
+	int maxIdx = 0;
+
+	for (int i = 0; i < len; i++) {
+		if (max < arr[i]) {
+			max = arr[i];
+			maxIdx = i;
+		}
+	}
+
+	return maxIdx;
 }
