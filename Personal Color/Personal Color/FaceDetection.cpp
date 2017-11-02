@@ -30,7 +30,7 @@ int findMaxIdx(int arr[], int len);
 String face_cascade_name = "haarcascade_frontalface_alt.xml";
 String eyes_cascade_name = "haarcascade_eye.xml";
 String nose_cascade_name = "Nariz.xml";
-String img_name = "김연아.png";
+String img_name = "크리스탈2.png";
 CascadeClassifier face_cascade;
 CascadeClassifier eyes_cascade;
 CascadeClassifier nose_cascade;
@@ -59,18 +59,19 @@ int main(int argc, const char** argv) {
 	if (!eyes_cascade.load(eyes_cascade_name)) { printf("--(!)Error Eyes cascade loading\n"); return -1;};
 	if (!nose_cascade.load(nose_cascade_name)) { printf("--(!)Error Nose cascade loading\n"); return -1;};
 
-	/*
+	
 	setFaceHSV(); //personal color setting
 	setLipHSV();
 	sampleExtraction(img); //Sample Extraction
 	rgbToHSV(); //RGB to HSV
-	*/
+	
 
-	setFaceLab(); 
-	setLipLab();
-	sampleExtraction(img); 
-	rgbToLab(); 
-
+	
+	//setFaceLab(); 
+	//setLipLab();
+	//sampleExtraction(img); 
+	//rgbToLab(); 
+	
 
 	/* Select main value */
 	mainVal[0] = binarySplit(forehead);
@@ -90,22 +91,22 @@ int main(int argc, const char** argv) {
 void setFaceLab () {
 	Mat temp(4, 4, CV_8UC3);
 
-	temp.at<Vec3b>(0, 0) = Vec3b(175, 215, 250); //Spring
-	temp.at<Vec3b>(0, 1) = Vec3b(158, 207, 255);
-	temp.at<Vec3b>(0, 2) = Vec3b(170, 203, 253);
-	temp.at<Vec3b>(0, 3) = Vec3b(140, 209, 252);
-	temp.at<Vec3b>(1, 0) = Vec3b(183, 234, 254); //Summer
-	temp.at<Vec3b>(1, 1) = Vec3b(198, 223, 255);
-	temp.at<Vec3b>(1, 2) = Vec3b(178, 221, 254);
-	temp.at<Vec3b>(1, 3) = Vec3b(132, 215, 253);
-	temp.at<Vec3b>(2, 0) = Vec3b(159, 225, 254); //Autumn
-	temp.at<Vec3b>(2, 1) = Vec3b(161, 210, 248);
-	temp.at<Vec3b>(2, 2) = Vec3b(138, 205, 250);
-	temp.at<Vec3b>(2, 3) = Vec3b(112, 177, 216);
-	temp.at<Vec3b>(3, 0) = Vec3b(157, 224, 255); //Winter
-	temp.at<Vec3b>(3, 1) = Vec3b(157, 211, 242);
-	temp.at<Vec3b>(3, 2) = Vec3b(131, 212, 249);
-	temp.at<Vec3b>(3, 3) = Vec3b(112, 181, 220);
+	temp.at<Vec3b>(0, 0) = Vec3b(168, 211, 251); //Spring
+	temp.at<Vec3b>(0, 1) = Vec3b(149, 202, 255);
+	temp.at<Vec3b>(0, 2) = Vec3b(161, 197, 253);
+	temp.at<Vec3b>(0, 3) = Vec3b(130, 204, 252);
+	temp.at<Vec3b>(1, 0) = Vec3b(174, 231, 253); //Summer
+	temp.at<Vec3b>(1, 1) = Vec3b(192, 219, 255);
+	temp.at<Vec3b>(1, 2) = Vec3b(170, 217, 254);
+	temp.at<Vec3b>(1, 3) = Vec3b(122, 210, 254);
+	temp.at<Vec3b>(2, 0) = Vec3b(150, 221, 255); //Autumn
+	temp.at<Vec3b>(2, 1) = Vec3b(152, 206, 247);
+	temp.at<Vec3b>(2, 2) = Vec3b(128, 201, 249);
+	temp.at<Vec3b>(2, 3) = Vec3b(101, 169, 212);
+	temp.at<Vec3b>(3, 0) = Vec3b(147, 220, 255); //Winter
+	temp.at<Vec3b>(3, 1) = Vec3b(148, 206, 242);
+	temp.at<Vec3b>(3, 2) = Vec3b(121, 207, 247);
+	temp.at<Vec3b>(3, 3) = Vec3b(102, 173, 216);
 
 	Mat tempLab;
 	temp.convertTo(tempLab, CV_32FC3, (double)1.f / 255.f);
@@ -125,23 +126,23 @@ void setFaceLab () {
 
 void setFaceHSV() {
 	Mat temp(4,4,CV_8UC3);
-
-	temp.at<Vec3b>(0, 0) = Vec3b(175, 215, 250); //Spring
-	temp.at<Vec3b>(0, 1) = Vec3b(158, 207, 255);
-	temp.at<Vec3b>(0, 2) = Vec3b(170, 203, 253);
-	temp.at<Vec3b>(0, 3) = Vec3b(140, 209, 252);
-	temp.at<Vec3b>(1, 0) = Vec3b(183, 234, 254); //Summer
-	temp.at<Vec3b>(1, 1) = Vec3b(198, 223, 255);
-	temp.at<Vec3b>(1, 2) = Vec3b(178, 221, 254);
-	temp.at<Vec3b>(1, 3) = Vec3b(132, 215, 253);
-	temp.at<Vec3b>(2, 0) = Vec3b(159, 225, 254); //Autumn
-	temp.at<Vec3b>(2, 1) = Vec3b(161, 210, 248);
-	temp.at<Vec3b>(2, 2) = Vec3b(138, 205, 250);
-	temp.at<Vec3b>(2, 3) = Vec3b(112, 177, 216);
-	temp.at<Vec3b>(3, 0) = Vec3b(157, 224, 255); //Winter
-	temp.at<Vec3b>(3, 1) = Vec3b(157, 211, 242);
-	temp.at<Vec3b>(3, 2) = Vec3b(131, 212, 249);
-	temp.at<Vec3b>(3, 3) = Vec3b(112, 181, 220);
+	
+	temp.at<Vec3b>(0, 0) = Vec3b(168, 211, 251); //Spring
+	temp.at<Vec3b>(0, 1) = Vec3b(149, 202, 255);
+	temp.at<Vec3b>(0, 2) = Vec3b(161, 197, 253);
+	temp.at<Vec3b>(0, 3) = Vec3b(130, 204, 252);
+	temp.at<Vec3b>(1, 0) = Vec3b(174, 231, 253); //Summer
+	temp.at<Vec3b>(1, 1) = Vec3b(192, 219, 255);
+	temp.at<Vec3b>(1, 2) = Vec3b(170, 217, 254);
+	temp.at<Vec3b>(1, 3) = Vec3b(122, 210, 254);
+	temp.at<Vec3b>(2, 0) = Vec3b(150, 221, 255); //Autumn
+	temp.at<Vec3b>(2, 1) = Vec3b(152, 206, 247);
+	temp.at<Vec3b>(2, 2) = Vec3b(128, 201, 249);
+	temp.at<Vec3b>(2, 3) = Vec3b(101, 169, 212);
+	temp.at<Vec3b>(3, 0) = Vec3b(147, 220, 255); //Winter
+	temp.at<Vec3b>(3, 1) = Vec3b(148, 206, 242);
+	temp.at<Vec3b>(3, 2) = Vec3b(121, 207, 247);
+	temp.at<Vec3b>(3, 3) = Vec3b(102, 173, 216);
 
 	Mat tempHSV;
 	temp.convertTo(tempHSV, CV_32FC3, (double)1.f/255.f);
@@ -556,22 +557,22 @@ int findSkin(Point3d a[]) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				distance[idx] = getDistanceLab(a[sampleN], skinColor[i][j]);
-				//printf("%lf\t", distance[idx]);
+				printf("%lf\t", distance[idx]);
 				idx++;
 			}
-			//printf("\n");
+			printf("\n");
 		}
 		personalColor[findMinIdx(distance, 16)] ++; //거리가 가장 짧은 계절(행index)을 반환한다	
 		for (int i = 0; i < 16; i++) { distance[i] = 0; } //초기화
 		
-		//printf("\n\n");
+		printf("\n\n");
 	}
 	
-	/*
+	
 	for (int i = 0; i < 4; i++) {
 		printf("%d  ", personalColor[i]);
 	}
-	*/
+	
 
 	return findMaxIdx(personalColor, 4);
 
@@ -585,6 +586,7 @@ void findLip(Point3d a[], int personalColor) {
 
 	//printf("%12lf\n%12lf\n%12lf\n\n", a[0].x, a[0].y, a[0].z);
 
+	/*
 	for (int i = 0; i < 6; i++) {
 		printf("%12lf", lipColor[personalColor][i].x);
 	}
@@ -599,11 +601,11 @@ void findLip(Point3d a[], int personalColor) {
 		printf("%12lf", lipColor[personalColor][i].z);
 	}
 	printf("\n\n");
-	
+	*/
 
 
 
-
+	/*
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 6; j++) {
 			distance[i][j] = getDistanceLab(a[i], lipColor[personalColor][j]);
@@ -611,6 +613,7 @@ void findLip(Point3d a[], int personalColor) {
 		}
 		printf("\n");
 	}
+	*/
 
 }
 

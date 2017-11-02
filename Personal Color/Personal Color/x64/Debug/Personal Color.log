@@ -3,16 +3,16 @@ c:\opencv\build\include\opencv2\core\mat.hpp(1965): warning C4819: 현재 코드
 c:\opencv\build\include\opencv2\core\persistence.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
 c:\opencv\build\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
 c:\opencv\build\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(273): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(280): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(287): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(298): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(274): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(281): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(288): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(299): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(534): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(300): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(535): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(538): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(536): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(539): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(541): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(558): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(609): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(540): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(542): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(559): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\khyoon\desktop\personal color\personal color\personal color\facedetection.cpp(582): warning C4101: 'distance' :참조되지 않은 지역 변수입니다.
   Personal Color.vcxproj -> C:\Users\khyoon\Desktop\Personal Color\Personal Color\x64\Debug\Personal Color.exe
