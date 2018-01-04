@@ -16,15 +16,18 @@ void setFaceLab();
 void setFaceHSV();
 void setLipLab();
 void setLipHSV();
+void setPalletteLab();
+void setPalletteHSV();
 void sampleExtraction(Mat frame);
 void rgbToLab();
 void rgbToHSV();
+void classification();
 Point3d binarySplit(Point3d sample[]);
 double getDistanceLab(Point3d a, Point3d b);
 double getDistanceHSV(Point3d a, Point3d b);
 int findSkin(Point3d a[]);
 void findLip(Point3d a[], int personalColor);
-int findMinIdx(float arr[], int len);
+int findMinIdx(double arr[], int len);
 int findMaxIdx(int arr[], int len);
 
 String face_cascade_name = "haarcascade_frontalface_alt.xml";
@@ -44,12 +47,14 @@ static Point3d cheek2[100];
 
 static Point3d skinColor[4][4];
 static Point3d lipColor[4][6];
+static Point3d palletteColor[16][8];
 
 int main(int argc, const char** argv) {
 	Mat img = imread(img_name);
 	Point3d mainVal[5]; //sample main value
 	int personalColor;
 
+	/*
 	if (img.data == NULL) {
 		printf("이미지 열기 실패");
 		return -1;
@@ -58,31 +63,34 @@ int main(int argc, const char** argv) {
 	if (!face_cascade.load(face_cascade_name)) { printf("--(!)Error Face cascade loading\n"); return -1;};
 	if (!eyes_cascade.load(eyes_cascade_name)) { printf("--(!)Error Eyes cascade loading\n"); return -1;};
 	if (!nose_cascade.load(nose_cascade_name)) { printf("--(!)Error Nose cascade loading\n"); return -1;};
-
+	*/
 	
-	setFaceHSV(); //personal color setting
-	setLipHSV();
-	sampleExtraction(img); //Sample Extraction
-	rgbToHSV(); //RGB to HSV
+	//setFaceHSV(); //personal color setting
+	//setLipHSV();
+	//setPalletteHSV();
+	//sampleExtraction(img); //Sample Extraction
+	//rgbToHSV(); //RGB to HSV
 	
 
 	
 	//setFaceLab(); 
-	//setLipLab();
+	setLipLab();
+	setPalletteLab();
 	//sampleExtraction(img); 
 	//rgbToLab(); 
 	
+	classification();
 
 	/* Select main value */
-	mainVal[0] = binarySplit(forehead);
-	mainVal[1] = binarySplit(temple1);
-	mainVal[2] = binarySplit(temple2);
-	mainVal[3] = binarySplit(cheek1);
-	mainVal[4] = binarySplit(cheek2);
+	//mainVal[0] = binarySplit(forehead);
+	//mainVal[1] = binarySplit(temple1);
+	//mainVal[2] = binarySplit(temple2);
+	//mainVal[3] = binarySplit(cheek1);
+	//mainVal[4] = binarySplit(cheek2);
 	
 	/* Find personal color */
-	personalColor = findSkin(mainVal);
-	findLip(mainVal, personalColor);
+	//personalColor = findSkin(mainVal);
+	//findLip(mainVal, personalColor);
 	
 	waitKey(0);
 	return 0;
@@ -192,7 +200,7 @@ void setLipLab() {
 	temp.convertTo(tempLab, CV_32FC3, (double)1.f / 255.f);
 
 	cvtColor(tempLab, tempLab, CV_BGR2Lab);
-
+	
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 6; j++) {
 			lipColor[i][j].x = tempLab.at<Vec3f>(i, j)[0];
@@ -206,31 +214,31 @@ void setLipLab() {
 
 void setLipHSV() {
 	Mat temp(4, 6, CV_8UC3);
-	
-	temp.at<Vec3b>(0, 0) = Vec3b(79,79,234); //Spring
-	temp.at<Vec3b>(0, 1) = Vec3b(73,29,195);
-	temp.at<Vec3b>(0, 2) = Vec3b(130,125,254);
-	temp.at<Vec3b>(0, 3) = Vec3b(111,127,247);
-	temp.at<Vec3b>(0, 4) = Vec3b(47,43,223);
-	temp.at<Vec3b>(0, 5) = Vec3b(84,110,250);
-	temp.at<Vec3b>(1, 0) = Vec3b(147,63,243); //Summer
-	temp.at<Vec3b>(1, 1) = Vec3b(73,29,195);
-	temp.at<Vec3b>(1, 2) = Vec3b(120,39,170);
-	temp.at<Vec3b>(1, 3) = Vec3b(43,18,203);
-	temp.at<Vec3b>(1, 4) = Vec3b(144,116,232);
-	temp.at<Vec3b>(1, 5) = Vec3b(106,50,228);
-	temp.at<Vec3b>(2, 0) = Vec3b(104,107,227); //Autumn
-	temp.at<Vec3b>(2, 1) = Vec3b(41,48,175);
-	temp.at<Vec3b>(2, 2) = Vec3b(45,32,186);
-	temp.at<Vec3b>(2, 3) = Vec3b(43,18,203);
-	temp.at<Vec3b>(2, 4) = Vec3b(47,43,223);
-	temp.at<Vec3b>(2, 5) = Vec3b(34,45,184);
-	temp.at<Vec3b>(3, 0) = Vec3b(63,26,160); //Winter
-	temp.at<Vec3b>(3, 1) = Vec3b(103,37,207);
-	temp.at<Vec3b>(3, 2) = Vec3b(120,39,170);
-	temp.at<Vec3b>(3, 3) = Vec3b(81,33,198);
-	temp.at<Vec3b>(3, 4) = Vec3b(40,5,164);
-	temp.at<Vec3b>(3, 5) = Vec3b(19,2,208);
+
+	temp.at<Vec3b>(0, 0) = Vec3b(79, 79, 234); //Spring
+	temp.at<Vec3b>(0, 1) = Vec3b(73, 29, 195);
+	temp.at<Vec3b>(0, 2) = Vec3b(130, 125, 254);
+	temp.at<Vec3b>(0, 3) = Vec3b(111, 127, 247);
+	temp.at<Vec3b>(0, 4) = Vec3b(47, 43, 223);
+	temp.at<Vec3b>(0, 5) = Vec3b(84, 110, 250);
+	temp.at<Vec3b>(1, 0) = Vec3b(147, 63, 243); //Summer
+	temp.at<Vec3b>(1, 1) = Vec3b(73, 29, 195);
+	temp.at<Vec3b>(1, 2) = Vec3b(120, 39, 170);
+	temp.at<Vec3b>(1, 3) = Vec3b(43, 18, 203);
+	temp.at<Vec3b>(1, 4) = Vec3b(144, 116, 232);
+	temp.at<Vec3b>(1, 5) = Vec3b(106, 50, 228);
+	temp.at<Vec3b>(2, 0) = Vec3b(104, 107, 227); //Autumn
+	temp.at<Vec3b>(2, 1) = Vec3b(41, 48, 175);
+	temp.at<Vec3b>(2, 2) = Vec3b(45, 32, 186);
+	temp.at<Vec3b>(2, 3) = Vec3b(43, 18, 203);
+	temp.at<Vec3b>(2, 4) = Vec3b(47, 43, 223);
+	temp.at<Vec3b>(2, 5) = Vec3b(34, 45, 184);
+	temp.at<Vec3b>(3, 0) = Vec3b(63, 26, 160); //Winter
+	temp.at<Vec3b>(3, 1) = Vec3b(103, 37, 207);
+	temp.at<Vec3b>(3, 2) = Vec3b(120, 39, 170);
+	temp.at<Vec3b>(3, 3) = Vec3b(81, 33, 198);
+	temp.at<Vec3b>(3, 4) = Vec3b(40, 5, 164);
+	temp.at<Vec3b>(3, 5) = Vec3b(19, 2, 208);
 
 	Mat tempHSV;
 	temp.convertTo(tempHSV, CV_32FC3, (double)1.f / 255.f);
@@ -240,12 +248,94 @@ void setLipHSV() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 6; j++) {
 			lipColor[i][j].x = tempHSV.at<Vec3f>(i, j)[0];
-			lipColor[i][j].y = 100*tempHSV.at<Vec3f>(i, j)[1];
-			lipColor[i][j].z = 100*tempHSV.at<Vec3f>(i, j)[2];
+			tempHSV.at<Vec3f>(i, j)[1] *= 100;
+			tempHSV.at<Vec3f>(i, j)[2] *= 100;
+			lipColor[i][j].y = tempHSV.at<Vec3f>(i, j)[1];
+			lipColor[i][j].z = tempHSV.at<Vec3f>(i, j)[2];
 		}
 	}
 
-	//imshow("LIP", temp);
+	//imshow("LIP", tempHSV);
+}
+
+void setPalletteLab() {
+	Mat temp(16, 8, CV_8UC3);
+
+	temp.at<Vec3b>(0, 0) = Vec3b(45, 103, 182); 	temp.at<Vec3b>(0, 1) = Vec3b(117, 162, 198);	temp.at<Vec3b>(0, 2) = Vec3b(159, 205, 234);	temp.at<Vec3b>(0, 3) = Vec3b(1210, 253, 254);	temp.at<Vec3b>(0, 4) = Vec3b(141, 224, 242);	temp.at<Vec3b>(0, 5) = Vec3b(65, 182, 215);		temp.at<Vec3b>(0, 6) = Vec3b(41, 184, 237);		temp.at<Vec3b>(0, 7) = Vec3b(56, 223, 250);
+	temp.at<Vec3b>(1, 0) = Vec3b(217, 134, 14);		temp.at<Vec3b>(1, 1) = Vec3b(226, 228, 62);		temp.at<Vec3b>(1, 2) = Vec3b(208, 213, 84);		temp.at<Vec3b>(1, 3) = Vec3b(185, 185, 0);		temp.at<Vec3b>(1, 4) = Vec3b(27, 210, 74);		temp.at<Vec3b>(1, 5) = Vec3b(60, 210, 163);		temp.at<Vec3b>(1, 6) = Vec3b(112, 235, 225);	temp.at<Vec3b>(1, 7) = Vec3b(35, 240, 252);
+	temp.at<Vec3b>(2, 0) = Vec3b(138, 0, 2); 		temp.at<Vec3b>(2, 1) = Vec3b(197, 59, 57);		temp.at<Vec3b>(2, 2) = Vec3b(207, 113, 85);		temp.at<Vec3b>(2, 3) = Vec3b(203, 157, 193);	temp.at<Vec3b>(2, 4) = Vec3b(228, 127, 219);	temp.at<Vec3b>(2, 5) = Vec3b(152, 34, 168);		temp.at<Vec3b>(2, 6) = Vec3b(108, 0, 254);		temp.at<Vec3b>(2, 7) = Vec3b(129, 140, 247);
+	temp.at<Vec3b>(3, 0) = Vec3b(29, 123, 248); 	temp.at<Vec3b>(3, 1) = Vec3b(170, 207, 254);	temp.at<Vec3b>(3, 2) = Vec3b(184, 211, 251);	temp.at<Vec3b>(3, 3) = Vec3b(6, 59, 247);		temp.at<Vec3b>(3, 4) = Vec3b(11, 138, 253);		temp.at<Vec3b>(3, 5) = Vec3b(88, 89, 252);		temp.at<Vec3b>(3, 6) = Vec3b(70, 0, 243);		temp.at<Vec3b>(3, 7) = Vec3b(215, 219, 251);
+
+	temp.at<Vec3b>(4, 0) = Vec3b(151, 168, 183);	temp.at<Vec3b>(4, 1) = Vec3b(222, 222, 222);	temp.at<Vec3b>(4, 2) = Vec3b(198, 198, 198);	temp.at<Vec3b>(4, 3) = Vec3b(187, 178, 169);	temp.at<Vec3b>(4, 4) = Vec3b(78, 61, 44);		temp.at<Vec3b>(4, 5) = Vec3b(80, 25, 25);		temp.at<Vec3b>(4, 6) = Vec3b(180, 132, 113);	temp.at<Vec3b>(4, 7) = Vec3b(233, 215, 186);
+	temp.at<Vec3b>(5, 0) = Vec3b(219, 147, 191);	temp.at<Vec3b>(5, 1) = Vec3b(170, 68, 122);		temp.at<Vec3b>(5, 2) = Vec3b(252, 61, 164);		temp.at<Vec3b>(5, 3) = Vec3b(223, 154, 158);	temp.at<Vec3b>(5, 4) = Vec3b(208, 113, 85);		temp.at<Vec3b>(5, 5) = Vec3b(209, 12, 12);		temp.at<Vec3b>(5, 6) = Vec3b(211, 126, 0);		temp.at<Vec3b>(5, 7) = Vec3b(236, 211, 145);
+	temp.at<Vec3b>(6, 0) = Vec3b(254, 182, 227);	temp.at<Vec3b>(6, 1) = Vec3b(217, 123, 222);	temp.at<Vec3b>(6, 2) = Vec3b(143, 80, 151);		temp.at<Vec3b>(6, 3) = Vec3b(169, 80, 213);		temp.at<Vec3b>(6, 4) = Vec3b(182, 113, 255);	temp.at<Vec3b>(6, 5) = Vec3b(130, 49, 234);		temp.at<Vec3b>(6, 6) = Vec3b(105, 16, 230);		temp.at<Vec3b>(6, 7) = Vec3b(185, 163, 250);
+	temp.at<Vec3b>(7, 0) = Vec3b(139, 138, 0);		temp.at<Vec3b>(7, 1) = Vec3b(147, 149, 5);		temp.at<Vec3b>(7, 2) = Vec3b(152, 187, 6);		temp.at<Vec3b>(7, 3) = Vec3b(195, 229, 167);	temp.at<Vec3b>(7, 4) = Vec3b(210, 251, 210);	temp.at<Vec3b>(7, 5) = Vec3b(152, 249, 251);	temp.at<Vec3b>(7, 6) = Vec3b(44, 0, 231);		temp.at<Vec3b>(7, 7) = Vec3b(76, 35, 253);
+
+	temp.at<Vec3b>(8, 0) = Vec3b(212, 252, 255);	temp.at<Vec3b>(8, 1) = Vec3b(187, 233, 253);	temp.at<Vec3b>(8, 2) = Vec3b(172, 208, 255);	temp.at<Vec3b>(8, 3) = Vec3b(90, 137, 255);		temp.at<Vec3b>(8, 4) = Vec3b(115, 150, 254);	temp.at<Vec3b>(8, 5) = Vec3b(37, 73, 248);		temp.at<Vec3b>(8, 6) = Vec3b(12, 39, 215);		temp.at<Vec3b>(8, 7) = Vec3b(29, 64, 194);
+	temp.at<Vec3b>(9, 0) = Vec3b(28, 112, 161);		temp.at<Vec3b>(9, 1) = Vec3b(67, 182, 217);		temp.at<Vec3b>(9, 2) = Vec3b(44, 205, 252);		temp.at<Vec3b>(9, 3) = Vec3b(17, 185, 246);		temp.at<Vec3b>(9, 4) = Vec3b(5, 181, 251);		temp.at<Vec3b>(9, 5) = Vec3b(31, 128, 255);		temp.at<Vec3b>(9, 6) = Vec3b(74, 101, 225);		temp.at<Vec3b>(9, 7) = Vec3b(19, 75, 190);
+	temp.at<Vec3b>(10, 0) = Vec3b(60, 138, 210);	temp.at<Vec3b>(10, 1) = Vec3b(69, 114, 175);	temp.at<Vec3b>(10, 2) = Vec3b(40, 78, 112);		temp.at<Vec3b>(10, 3) = Vec3b(118, 163, 198);	temp.at<Vec3b>(10, 4) = Vec3b(159, 205, 234);	temp.at<Vec3b>(10, 5) = Vec3b(153, 183, 201);	temp.at<Vec3b>(10, 6) = Vec3b(77, 101, 77);		temp.at<Vec3b>(10, 7) = Vec3b(68, 116, 100);
+	temp.at<Vec3b>(11, 0) = Vec3b(92, 75, 108);		temp.at<Vec3b>(11, 1) = Vec3b(207, 113, 85);	temp.at<Vec3b>(11, 2) = Vec3b(139, 138, 0);		temp.at<Vec3b>(11, 3) = Vec3b(181, 202, 29);	temp.at<Vec3b>(11, 4) = Vec3b(91, 137, 2);		temp.at<Vec3b>(11, 5) = Vec3b(41, 79, 2);		temp.at<Vec3b>(11, 6) = Vec3b(167, 205, 168);	temp.at<Vec3b>(11, 7) = Vec3b(106, 236, 174);
+
+	temp.at<Vec3b>(12, 0) = Vec3b(225, 229, 230);	temp.at<Vec3b>(12, 1) = Vec3b(215, 215, 215);	temp.at<Vec3b>(12, 2) = Vec3b(196, 196, 196);	temp.at<Vec3b>(12, 3) = Vec3b(91, 80, 65);		temp.at<Vec3b>(12, 4) = Vec3b(0, 0, 0);			temp.at<Vec3b>(12, 5) = Vec3b(112, 44, 0);		temp.at<Vec3b>(12, 6) = Vec3b(137, 2, 2);		temp.at<Vec3b>(12, 7) = Vec3b(197, 60, 57);
+	temp.at<Vec3b>(13, 0) = Vec3b(3, 137, 2);		temp.at<Vec3b>(13, 1) = Vec3b(84, 131, 2);		temp.at<Vec3b>(13, 2) = Vec3b(139, 138, 0);		temp.at<Vec3b>(13, 3) = Vec3b(202, 189, 74);	temp.at<Vec3b>(13, 4) = Vec3b(174, 152, 0);		temp.at<Vec3b>(13, 5) = Vec3b(243, 226, 194);	temp.at<Vec3b>(13, 6) = Vec3b(211, 126, 0);		temp.at<Vec3b>(13, 7) = Vec3b(207, 113, 85);
+	temp.at<Vec3b>(14, 0) = Vec3b(105, 194, 30);	temp.at<Vec3b>(14, 1) = Vec3b(186, 249, 251);	temp.at<Vec3b>(14, 2) = Vec3b(0, 248, 255);		temp.at<Vec3b>(14, 3) = Vec3b(0, 0, 254);		temp.at<Vec3b>(14, 4) = Vec3b(44, 0, 231);		temp.at<Vec3b>(14, 5) = Vec3b(39, 2, 138);		temp.at<Vec3b>(14, 6) = Vec3b(105, 16, 231);	temp.at<Vec3b>(14, 7) = Vec3b(112, 39, 247);
+	temp.at<Vec3b>(15, 0) = Vec3b(177, 93, 130);	temp.at<Vec3b>(15, 1) = Vec3b(248, 207, 231);	temp.at<Vec3b>(15, 2) = Vec3b(225, 58, 211);	temp.at<Vec3b>(15, 3) = Vec3b(254, 0, 255);		temp.at<Vec3b>(15, 4) = Vec3b(199, 21, 252);	temp.at<Vec3b>(15, 5) = Vec3b(208, 113, 254);	temp.at<Vec3b>(15, 6) = Vec3b(153, 2, 254);		temp.at<Vec3b>(15, 7) = Vec3b(235, 222, 251);
+
+	Mat tempLab;
+	temp.convertTo(tempLab, CV_32FC3, (double)1.f / 255.f);
+
+	cvtColor(tempLab, tempLab, CV_BGR2Lab);
+
+	for (int i = 0; i < 16; i++) {
+		for (int j = 0; j < 8; j++) {
+			palletteColor[i][j].x = tempLab.at<Vec3f>(i, j)[0];
+			palletteColor[i][j].y = tempLab.at<Vec3f>(i, j)[1];
+			palletteColor[i][j].z = tempLab.at<Vec3f>(i, j)[2];
+		}
+	}
+
+ 	//imshow("Pallette", tempLab);
+}
+
+void setPalletteHSV() {
+	Mat temp(16, 8, CV_8UC3);
+
+	temp.at<Vec3b>(0, 0) = Vec3b(45, 103, 182); 	temp.at<Vec3b>(0, 1) = Vec3b(117, 162, 198);	temp.at<Vec3b>(0, 2) = Vec3b(159, 205, 234);	temp.at<Vec3b>(0, 3) = Vec3b(1210, 253, 254);	temp.at<Vec3b>(0, 4) = Vec3b(141, 224, 242);	temp.at<Vec3b>(0, 5) = Vec3b(65, 182, 215);		temp.at<Vec3b>(0, 6) = Vec3b(41, 184, 237);		temp.at<Vec3b>(0, 7) = Vec3b(56, 223, 250);
+	temp.at<Vec3b>(1, 0) = Vec3b(217, 134, 14);		temp.at<Vec3b>(1, 1) = Vec3b(226, 228, 62);		temp.at<Vec3b>(1, 2) = Vec3b(208, 213, 84);		temp.at<Vec3b>(1, 3) = Vec3b(185, 185, 0);		temp.at<Vec3b>(1, 4) = Vec3b(27, 210, 74);		temp.at<Vec3b>(1, 5) = Vec3b(60, 210, 163);		temp.at<Vec3b>(1, 6) = Vec3b(112, 235, 225);	temp.at<Vec3b>(1, 7) = Vec3b(35, 240, 252);
+	temp.at<Vec3b>(2, 0) = Vec3b(138, 0, 2); 		temp.at<Vec3b>(2, 1) = Vec3b(197, 59, 57);		temp.at<Vec3b>(2, 2) = Vec3b(207, 113, 85);		temp.at<Vec3b>(2, 3) = Vec3b(203, 157, 193);	temp.at<Vec3b>(2, 4) = Vec3b(228, 127, 219);	temp.at<Vec3b>(2, 5) = Vec3b(152, 34, 168);		temp.at<Vec3b>(2, 6) = Vec3b(108, 0, 254);		temp.at<Vec3b>(2, 7) = Vec3b(129, 140, 247);
+	temp.at<Vec3b>(3, 0) = Vec3b(29, 123, 248); 	temp.at<Vec3b>(3, 1) = Vec3b(170, 207, 254);	temp.at<Vec3b>(3, 2) = Vec3b(184, 211, 251);	temp.at<Vec3b>(3, 3) = Vec3b(6, 59, 247);		temp.at<Vec3b>(3, 4) = Vec3b(11, 138, 253);		temp.at<Vec3b>(3, 5) = Vec3b(88, 89, 252);		temp.at<Vec3b>(3, 6) = Vec3b(70, 0, 243);		temp.at<Vec3b>(3, 7) = Vec3b(215, 219, 251);
+
+	temp.at<Vec3b>(4, 0) = Vec3b(151, 168, 183);	temp.at<Vec3b>(4, 1) = Vec3b(222, 222, 222);	temp.at<Vec3b>(4, 2) = Vec3b(198, 198, 198);	temp.at<Vec3b>(4, 3) = Vec3b(187, 178, 169);	temp.at<Vec3b>(4, 4) = Vec3b(78, 61, 44);		temp.at<Vec3b>(4, 5) = Vec3b(80, 25, 25);		temp.at<Vec3b>(4, 6) = Vec3b(180, 132, 113);	temp.at<Vec3b>(4, 7) = Vec3b(233, 215, 186);
+	temp.at<Vec3b>(5, 0) = Vec3b(219, 147, 191);	temp.at<Vec3b>(5, 1) = Vec3b(170, 68, 122);		temp.at<Vec3b>(5, 2) = Vec3b(252, 61, 164);		temp.at<Vec3b>(5, 3) = Vec3b(223, 154, 158);	temp.at<Vec3b>(5, 4) = Vec3b(208, 113, 85);		temp.at<Vec3b>(5, 5) = Vec3b(209, 12, 12);		temp.at<Vec3b>(5, 6) = Vec3b(211, 126, 0);		temp.at<Vec3b>(5, 7) = Vec3b(236, 211, 145);
+	temp.at<Vec3b>(6, 0) = Vec3b(254, 182, 227);	temp.at<Vec3b>(6, 1) = Vec3b(217, 123, 222);	temp.at<Vec3b>(6, 2) = Vec3b(143, 80, 151);		temp.at<Vec3b>(6, 3) = Vec3b(169, 80, 213);		temp.at<Vec3b>(6, 4) = Vec3b(182, 113, 255);	temp.at<Vec3b>(6, 5) = Vec3b(130, 49, 234);		temp.at<Vec3b>(6, 6) = Vec3b(105, 16, 230);		temp.at<Vec3b>(6, 7) = Vec3b(185, 163, 250);
+	temp.at<Vec3b>(7, 0) = Vec3b(139, 138, 0);		temp.at<Vec3b>(7, 1) = Vec3b(147, 149, 5);		temp.at<Vec3b>(7, 2) = Vec3b(152, 187, 6);		temp.at<Vec3b>(7, 3) = Vec3b(195, 229, 167);	temp.at<Vec3b>(7, 4) = Vec3b(210, 251, 210);	temp.at<Vec3b>(7, 5) = Vec3b(152, 249, 251);	temp.at<Vec3b>(7, 6) = Vec3b(44, 0, 231);		temp.at<Vec3b>(7, 7) = Vec3b(76, 35, 253);
+
+	temp.at<Vec3b>(8, 0) = Vec3b(212, 252, 255);	temp.at<Vec3b>(8, 1) = Vec3b(187, 233, 253);	temp.at<Vec3b>(8, 2) = Vec3b(172, 208, 255);	temp.at<Vec3b>(8, 3) = Vec3b(90, 137, 255);		temp.at<Vec3b>(8, 4) = Vec3b(115, 150, 254);	temp.at<Vec3b>(8, 5) = Vec3b(37, 73, 248);		temp.at<Vec3b>(8, 6) = Vec3b(12, 39, 215);		temp.at<Vec3b>(8, 7) = Vec3b(29, 64, 194);
+	temp.at<Vec3b>(9, 0) = Vec3b(28, 112, 161);		temp.at<Vec3b>(9, 1) = Vec3b(67, 182, 217);		temp.at<Vec3b>(9, 2) = Vec3b(44, 205, 252);		temp.at<Vec3b>(9, 3) = Vec3b(17, 185, 246);		temp.at<Vec3b>(9, 4) = Vec3b(5, 181, 251);		temp.at<Vec3b>(9, 5) = Vec3b(31, 128, 255);		temp.at<Vec3b>(9, 6) = Vec3b(74, 101, 225);		temp.at<Vec3b>(9, 7) = Vec3b(19, 75, 190);
+	temp.at<Vec3b>(10, 0) = Vec3b(60, 138, 210);	temp.at<Vec3b>(10, 1) = Vec3b(69, 114, 175);	temp.at<Vec3b>(10, 2) = Vec3b(40, 78, 112);		temp.at<Vec3b>(10, 3) = Vec3b(118, 163, 198);	temp.at<Vec3b>(10, 4) = Vec3b(159, 205, 234);	temp.at<Vec3b>(10, 5) = Vec3b(153, 183, 201);	temp.at<Vec3b>(10, 6) = Vec3b(77, 101, 77);		temp.at<Vec3b>(10, 7) = Vec3b(68, 116, 100);
+	temp.at<Vec3b>(11, 0) = Vec3b(92, 75, 108);		temp.at<Vec3b>(11, 1) = Vec3b(207, 113, 85);	temp.at<Vec3b>(11, 2) = Vec3b(139, 138, 0);		temp.at<Vec3b>(11, 3) = Vec3b(181, 202, 29);	temp.at<Vec3b>(11, 4) = Vec3b(91, 137, 2);		temp.at<Vec3b>(11, 5) = Vec3b(41, 79, 2);		temp.at<Vec3b>(11, 6) = Vec3b(167, 205, 168);	temp.at<Vec3b>(11, 7) = Vec3b(106, 236, 174);
+
+	temp.at<Vec3b>(12, 0) = Vec3b(225, 229, 230);	temp.at<Vec3b>(12, 1) = Vec3b(215, 215, 215);	temp.at<Vec3b>(12, 2) = Vec3b(196, 196, 196);	temp.at<Vec3b>(12, 3) = Vec3b(91, 80, 65);		temp.at<Vec3b>(12, 4) = Vec3b(0, 0, 0);			temp.at<Vec3b>(12, 5) = Vec3b(112, 44, 0);		temp.at<Vec3b>(12, 6) = Vec3b(137, 2, 2);		temp.at<Vec3b>(12, 7) = Vec3b(197, 60, 57);
+	temp.at<Vec3b>(13, 0) = Vec3b(3, 137, 2);		temp.at<Vec3b>(13, 1) = Vec3b(84, 131, 2);		temp.at<Vec3b>(13, 2) = Vec3b(139, 138, 0);		temp.at<Vec3b>(13, 3) = Vec3b(202, 189, 74);	temp.at<Vec3b>(13, 4) = Vec3b(174, 152, 0);		temp.at<Vec3b>(13, 5) = Vec3b(243, 226, 194);	temp.at<Vec3b>(13, 6) = Vec3b(211, 126, 0);		temp.at<Vec3b>(13, 7) = Vec3b(207, 113, 85);
+	temp.at<Vec3b>(14, 0) = Vec3b(105, 194, 30);	temp.at<Vec3b>(14, 1) = Vec3b(186, 249, 251);	temp.at<Vec3b>(14, 2) = Vec3b(0, 248, 255);		temp.at<Vec3b>(14, 3) = Vec3b(0, 0, 254);		temp.at<Vec3b>(14, 4) = Vec3b(44, 0, 231);		temp.at<Vec3b>(14, 5) = Vec3b(39, 2, 138);		temp.at<Vec3b>(14, 6) = Vec3b(105, 16, 231);	temp.at<Vec3b>(14, 7) = Vec3b(112, 39, 247);
+	temp.at<Vec3b>(15, 0) = Vec3b(177, 93, 130);	temp.at<Vec3b>(15, 1) = Vec3b(248, 207, 231);	temp.at<Vec3b>(15, 2) = Vec3b(225, 58, 211);	temp.at<Vec3b>(15, 3) = Vec3b(254, 0, 255);		temp.at<Vec3b>(15, 4) = Vec3b(199, 21, 252);	temp.at<Vec3b>(15, 5) = Vec3b(208, 113, 254);	temp.at<Vec3b>(15, 6) = Vec3b(153, 2, 254);		temp.at<Vec3b>(15, 7) = Vec3b(235, 222, 251);
+
+	Mat tempHSV;
+	temp.convertTo(tempHSV, CV_32FC3, (double)1.f / 255.f);
+
+	cvtColor(tempHSV, tempHSV, CV_BGR2HSV);
+
+	for (int i = 0; i < 16; i++) {
+		for (int j = 0; j < 8; j++) {
+			palletteColor[i][j].x = tempHSV.at<Vec3f>(i, j)[0];
+			tempHSV.at<Vec3f>(i, j)[1] *= 100;
+			tempHSV.at<Vec3f>(i, j)[2] *= 100;
+			palletteColor[i][j].y = tempHSV.at<Vec3f>(i, j)[1];
+			palletteColor[i][j].z = tempHSV.at<Vec3f>(i, j)[2];
+		}
+	}
+
+	//imshow("Pallette", tempHSV);
 }
 
 void sampleExtraction(Mat frame) {
@@ -547,7 +637,7 @@ double getDistanceHSV(Point3d a, Point3d b) {
 }
 
 int findSkin(Point3d a[]) {
-	float distance[16];
+	double distance[16];
 	int personalColor[4] = { 0, }; //봄,여름,가을,겨울 = 0,1,2,3
 	
 	
@@ -576,7 +666,7 @@ int findSkin(Point3d a[]) {
 
 	return findMaxIdx(personalColor, 4);
 
-}
+ }
 
 void findLip(Point3d a[], int personalColor) {
 	float distance[5][6]; 
@@ -617,8 +707,8 @@ void findLip(Point3d a[], int personalColor) {
 
 }
 
-int findMinIdx(float arr[], int len) {
-	float min = arr[0];
+int findMinIdx(double arr[], int len) {
+	double min = arr[0];
 	int minIdx = 0;
 	
 	for (int i = 0; i < len; i++) {
@@ -627,7 +717,7 @@ int findMinIdx(float arr[], int len) {
 			minIdx = i;
 		}
 	}
-	return minIdx / 4;
+	return minIdx;
 }
 
 int findMaxIdx(int arr[], int len) {
@@ -642,4 +732,29 @@ int findMaxIdx(int arr[], int len) {
 	}
 
 	return maxIdx;
+}
+
+void classification() {
+	double distance[32];
+	int idx;
+	int minIdx = 0;
+	
+	//for (int i = 0; i < 6; i++) {
+		idx = 0;
+		//printf("%12lf %12lf %12lf\n", lipColor[1][0].x, lipColor[1][0].y, lipColor[1][0].z);
+
+		for (int a = 0; a < 4; a++) {
+			for (int b = 0; b < 8; b++) {
+				distance[idx] = getDistanceLab(lipColor[1][0], palletteColor[a][b]);
+				//printf("%12lf", distance[idx]);
+				idx++;
+			}
+			//printf("\n");
+		}
+		//printf("\n");
+		minIdx = findMinIdx(distance, 32);
+		printf("%d %d\n", (minIdx / 8)+1, (minIdx % 8)+1);
+	//}
+	
+
 }
